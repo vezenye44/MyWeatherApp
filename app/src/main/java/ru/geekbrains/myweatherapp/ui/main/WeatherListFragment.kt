@@ -6,6 +6,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import ru.geekbrains.myweatherapp.AppState
 import ru.geekbrains.myweatherapp.R
 
 class WeatherListFragment : Fragment() {
@@ -30,7 +31,7 @@ class WeatherListFragment : Fragment() {
 
     }
 
-    private fun renderData(data: Any) {
+    private fun renderData(data: AppState) {
 
     }
 
