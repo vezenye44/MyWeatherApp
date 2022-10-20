@@ -26,6 +26,12 @@ class WeatherListFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(this).get(WeatherListViewModel::class.java)
+        viewModel.getLiveData().observe(viewLifecycleOwner) { renderData(it)}
+
+    }
+
+    private fun renderData(data: Any) {
+
     }
 
 }
