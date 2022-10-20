@@ -8,13 +8,13 @@ import android.view.View
 import android.view.ViewGroup
 import ru.geekbrains.myweatherapp.R
 
-class MainFragment : Fragment() {
+class WeatherListFragment : Fragment() {
 
     companion object {
-        fun newInstance() = MainFragment()
+        fun newInstance() = WeatherListFragment()
     }
 
-    private lateinit var viewModel: MainViewModel
+    private lateinit var viewModel: WeatherListViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -23,10 +23,9 @@ class MainFragment : Fragment() {
         return inflater.inflate(R.layout.main_fragment, container, false)
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-        viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
-        // TODO: Use the ViewModel
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        viewModel = ViewModelProvider(this).get(WeatherListViewModel::class.java)
     }
 
 }

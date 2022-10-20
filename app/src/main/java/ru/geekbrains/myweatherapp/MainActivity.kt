@@ -2,7 +2,7 @@ package ru.geekbrains.myweatherapp
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import ru.geekbrains.myweatherapp.ui.main.MainFragment
+import ru.geekbrains.myweatherapp.ui.main.WeatherListFragment
 
 class MainActivity : AppCompatActivity() {
 
@@ -11,7 +11,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.main_activity)
         if (savedInstanceState == null) {
             supportFragmentManager.beginTransaction()
-                .replace(R.id.container, MainFragment.newInstance())
+                .replace(R.id.container, WeatherListFragment.newInstance())
                 .commitNow()
         }
     }
