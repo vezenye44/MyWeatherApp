@@ -2,7 +2,7 @@ package ru.geekbrains.myweatherapp
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import ru.geekbrains.myweatherapp.ui.main.WeatherListFragment
+import ru.geekbrains.myweatherapp.ui.listweather.WeatherListFragment
 
 class MainActivity : AppCompatActivity() {
 
