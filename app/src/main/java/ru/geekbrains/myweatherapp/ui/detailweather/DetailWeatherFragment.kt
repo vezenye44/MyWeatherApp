@@ -26,29 +26,24 @@ class DetailWeatherFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        // TODO современное решение
-        val weather = arguments?.get(BUNDLE_WEATHER) as Weather
-        renderData(weather)
+        arguments?.getParcelable<Weather>(BUNDLE_WEATHER)?.let {weather -> renderData(weather)}
     }
 
     private fun renderData(weatherData: Weather) {
-        binding.cityName.text = weatherData.city.name
-        binding.cityCoordinates.text = String.format(
-            getString(R.string.city_coordinates),
-            weatherData.city.lat.toString(),
-            weatherData.city.lon.toString()
-        )
-        binding.temperatureValue.text = weatherData.temperature.toString()
-        binding.feelsLikeValue.text = weatherData.feelsLike.toString()
+        with(binding) {
+            this.cityName.text = weatherData.city.name
+            this.cityCoordinates.text = String.format(
+                getString(R.string.city_coordinates),
+                weatherData.city.lat.toString(),
+                weatherData.city.lon.toString()
+            )
+            this.temperatureValue.text = weatherData.temperature.toString()
+            this.feelsLikeValue.text = weatherData.feelsLike.toString()
+        }
     }
 
     companion object {
         const val BUNDLE_WEATHER = "weather"
-
-        fun newInstance(bundle:Bundle): DetailWeatherFragment {
-            val fragment = DetailWeatherFragment()
-            fragment.arguments = bundle
-            return fragment
-        }
+        fun newInstance(bundle:Bundle) = DetailWeatherFragment().apply { arguments = bundle }
     }
 }
