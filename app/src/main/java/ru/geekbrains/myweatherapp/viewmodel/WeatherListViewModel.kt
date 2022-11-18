@@ -1,4 +1,4 @@
-package ru.geekbrains.myweatherapp.ui.listweather
+package ru.geekbrains.myweatherapp.viewmodel
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
