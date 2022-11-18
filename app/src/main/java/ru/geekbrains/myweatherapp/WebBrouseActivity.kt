@@ -41,7 +41,7 @@ class WebBrouseActivity : AppCompatActivity() {
                         urlConnection = uri.openConnection() as HttpsURLConnection
                         urlConnection.requestMethod = "GET"
                         urlConnection.readTimeout = 10000
-                        urlConnection.addRequestProperty("X-Yandex-API-Key","...")
+                        urlConnection.addRequestProperty("X-Yandex-API-Key",BuildConfig.WEATHER_API_KEY)
                         val code = urlConnection.responseCode
                         if (code == 200) {
                             val inputStream = urlConnection.inputStream
