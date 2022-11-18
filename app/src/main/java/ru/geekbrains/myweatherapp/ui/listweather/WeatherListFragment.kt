@@ -8,12 +8,13 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.snackbar.Snackbar
 import ru.geekbrains.myweatherapp.R
-import ru.geekbrains.myweatherapp.Weather
 import ru.geekbrains.myweatherapp.databinding.WeatherListFragmentBinding
 import ru.geekbrains.myweatherapp.ui.detailweather.DetailWeatherFragment
+import ru.geekbrains.myweatherapp.util.showSnackBar
 import ru.geekbrains.myweatherapp.viewmodel.AppState
+import ru.geekbrains.myweatherapp.viewmodel.WeatherListViewModel
 
-class WeatherListFragment : Fragment(), OnItemClicked {
+class WeatherListFragment : Fragment(){
 
     companion object {
         fun newInstance() = WeatherListFragment()
@@ -22,7 +23,10 @@ class WeatherListFragment : Fragment(), OnItemClicked {
     private lateinit var viewModel: WeatherListViewModel
     private var _binding: WeatherListFragmentBinding? = null
     private val binding get() = _binding!!
-
+    override fun onDestroy() {
+        _binding = null
+        super.onDestroy()
+    }
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -35,8 +39,10 @@ class WeatherListFragment : Fragment(), OnItemClicked {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel = ViewModelProvider(this)[WeatherListViewModel::class.java]
-        viewModel.getLiveData().observe(viewLifecycleOwner) { renderData(it) }
+        viewModel = ViewModelProvider(this)[WeatherListViewModel::class.java].also {model ->
+            model.getLiveData().observe(viewLifecycleOwner) { renderData(it) }
+        }
+
 
         sentList()
 
@@ -55,12 +61,6 @@ class WeatherListFragment : Fragment(), OnItemClicked {
             binding.weatherFragmentFAB.setImageResource(R.drawable.ic_russia)
         }
     }
-    override fun onItemClick(weather: Weather) {
-        val bundle = Bundle()
-        bundle.putParcelable(DetailWeatherFragment.BUNDLE_WEATHER, weather)
-        requireActivity().supportFragmentManager.beginTransaction().hide(this).add(R.id.container,DetailWeatherFragment.newInstance(bundle))
-            .addToBackStack("").commit()
-    }
     private fun renderData(appState: AppState) {
         when (appState) {
             is AppState.Success -> {
@@ -73,15 +73,19 @@ class WeatherListFragment : Fragment(), OnItemClicked {
             }
             is AppState.Error -> {
                 binding.weatherFragmentLoadingLayout.visibility = View.GONE
-                Snackbar
-                    .make(binding.root, "Error", Snackbar.LENGTH_INDEFINITE)
-                    .setAction("Reload") { viewModel.getWeather() }
-                    .show()
+                binding.root.showSnackBar("Error",Snackbar.LENGTH_INDEFINITE)
             }
             is AppState.SuccessListWeather -> {
                 val listWeather = appState.weatherList
                 binding.weatherFragmentLoadingLayout.visibility = View.GONE
-                binding.weatherFragmentRecyclerView.adapter = WeatherListAdapter(listWeather, this)
+                binding.weatherFragmentRecyclerView.adapter = WeatherListAdapter(listWeather) {weather ->
+                    requireActivity().supportFragmentManager
+                        .beginTransaction()
+                        .hide(this)
+                        .add(R.id.container
+                            ,DetailWeatherFragment.newInstance(Bundle().apply { putParcelable(DetailWeatherFragment.BUNDLE_WEATHER, weather) }))
+                        .addToBackStack("").commit()
+                }
             }
         }
     }
