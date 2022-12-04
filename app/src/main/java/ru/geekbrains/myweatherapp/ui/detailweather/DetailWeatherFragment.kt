@@ -1,26 +1,22 @@
 package ru.geekbrains.myweatherapp.ui.detailweather
 
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
+import com.google.gson.Gson
+import okhttp3.*
+import ru.geekbrains.myweatherapp.BuildConfig
 import ru.geekbrains.myweatherapp.R
 import ru.geekbrains.myweatherapp.Weather
 import ru.geekbrains.myweatherapp.databinding.DetailWeatherFragmentBinding
-import ru.geekbrains.myweatherapp.domain.FactDTO
 import ru.geekbrains.myweatherapp.domain.WeatherDTO
 import ru.geekbrains.myweatherapp.domain.getCondition
-import ru.geekbrains.myweatherapp.viewmodel.DetailsService
-import ru.geekbrains.myweatherapp.viewmodel.LATITUDE_EXTRA
-import ru.geekbrains.myweatherapp.viewmodel.LONGITUDE_EXTRA
+import java.io.IOException
 
 const val DETAILS_INTENT_FILTER = "DETAILS INTENT FILTER"
 const val DETAILS_LOAD_RESULT_EXTRA = "LOAD RESULT"
@@ -37,62 +33,13 @@ const val DETAILS_CONDITION_EXTRA = "CONDITION"
 private const val TEMP_INVALID = -100
 private const val FEELS_LIKE_INVALID = -100
 private const val PROCESS_ERROR = "Обработка ошибки"
+private const val MAIN_LINK = "https://api.weather.yandex.ru/v2/forecast?"
 
 class DetailWeatherFragment : Fragment() {
 
     private lateinit var weatherBundle: Weather
     private var _binding: DetailWeatherFragmentBinding? = null
     private val binding get() = _binding!!
-    private val loadResultsReceiver: BroadcastReceiver = object :
-        BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent) {
-            fun showError(error: String) {
-                Toast.makeText(requireContext(), "ERROR IN : + $error", Toast.LENGTH_LONG).show()
-            }
-            when (intent.getStringExtra(DETAILS_LOAD_RESULT_EXTRA)) {
-                DETAILS_INTENT_EMPTY_EXTRA -> showError(DETAILS_INTENT_EMPTY_EXTRA)
-                DETAILS_DATA_EMPTY_EXTRA -> showError(DETAILS_DATA_EMPTY_EXTRA)
-                DETAILS_RESPONSE_EMPTY_EXTRA -> showError(DETAILS_RESPONSE_EMPTY_EXTRA)
-                DETAILS_REQUEST_ERROR_EXTRA -> showError(DETAILS_REQUEST_ERROR_EXTRA)
-                DETAILS_REQUEST_ERROR_MESSAGE_EXTRA -> showError(DETAILS_REQUEST_ERROR_MESSAGE_EXTRA)
-                DETAILS_URL_MALFORMED_EXTRA -> showError(DETAILS_URL_MALFORMED_EXTRA)
-                DETAILS_RESPONSE_SUCCESS_EXTRA -> displayWeather(
-                    WeatherDTO(
-                        FactDTO(
-                            intent.getIntExtra(
-                                DETAILS_TEMP_EXTRA, TEMP_INVALID
-                            ),
-                            intent.getIntExtra(
-                                DETAILS_FEELS_LIKE_EXTRA,
-                                FEELS_LIKE_INVALID
-                            ),
-                            intent.getStringExtra(
-                                DETAILS_CONDITION_EXTRA
-                            )
-                        )
-                    )
-                )
-                else -> showError("else errors")
-            }
-        }
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        context?.let {
-            it.registerReceiver(
-                loadResultsReceiver,
-                IntentFilter(DETAILS_INTENT_FILTER)
-            )
-        }
-    }
-
-    override fun onDestroy() {
-        context?.let {
-            it.unregisterReceiver(loadResultsReceiver)
-        }
-        super.onDestroy()
-    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         _binding = DetailWeatherFragmentBinding.inflate(inflater)
@@ -109,18 +56,38 @@ class DetailWeatherFragment : Fragment() {
     private fun getWeather() {
         binding.root.visibility = View.GONE
         binding.loadingLayout.visibility = View.VISIBLE
-        context?.let {
-            it.startService(Intent(it, DetailsService::class.java).apply {
-                putExtra(
-                    LATITUDE_EXTRA,
-                    weatherBundle.city.lat
-                )
-                putExtra(
-                    LONGITUDE_EXTRA,
-                    weatherBundle.city.lon
-                )
+
+        val call: Call = OkHttpClient().newCall(
+            Request.Builder().apply {
+                addHeader("X-Yandex-API-Key", BuildConfig.WEATHER_API_KEY)
+                url(MAIN_LINK + "lat=${weatherBundle.city.lat}&lon=${weatherBundle.city.lon}")
+            }.build()
+        ).apply {
+            enqueue(object : Callback {
+                val handler: Handler = Handler()
+
+                override fun onResponse(call: Call, response: Response) {
+                    val serverResponse: String? = response.body()?.string()
+                    if (response.isSuccessful && serverResponse != null) {
+                        handler.post {
+                            displayWeather(
+                                Gson().fromJson(
+                                    serverResponse,
+                                    WeatherDTO::class.java
+                                )
+                            )
+                        }
+                    } else {
+                        TODO(PROCESS_ERROR)
+                    }
+                }
+
+                override fun onFailure(call: Call, e: IOException) {
+                    TODO(PROCESS_ERROR)
+                }
             })
         }
+
     }
 
     private fun displayWeather(weatherDTO: WeatherDTO) {
@@ -131,8 +98,7 @@ class DetailWeatherFragment : Fragment() {
             val temp = fact!!.temp
             val feelsLike = fact.feels_like
             val condition = fact.condition
-            if (temp == TEMP_INVALID || feelsLike == FEELS_LIKE_INVALID || condition
-                == null
+            if (fact == null || temp == null || feelsLike == null || condition.isNullOrEmpty()
             ) {
                 TODO(PROCESS_ERROR)
             } else {
