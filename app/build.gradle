@@ -45,6 +45,9 @@ android {
 
 dependencies {
 
+    //OkHttp
+    implementation 'com.squareup.okhttp3:okhttp:3.14.9'
+
     // GSON
     implementation 'com.google.code.gson:gson:2.8.5'
 
