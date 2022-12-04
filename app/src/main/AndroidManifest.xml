@@ -12,10 +12,6 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MyWeatherApp" >
         <activity
-            android:name=".WebBrouseActivity"
-            android:exported="true" >
-        </activity>
-        <activity
             android:name=".MainActivity"
             android:exported="true" >
             <intent-filter>
