@@ -7,8 +7,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import com.squareup.picasso.Picasso
 import okhttp3.*
 import ru.geekbrains.myweatherapp.R
 import ru.geekbrains.myweatherapp.Weather
@@ -45,6 +45,26 @@ class DetailWeatherFragment : Fragment() {
         viewModel.getWeatherFromRemoteSource(weatherBundle.city.lat, weatherBundle.city.lon)
     }
 
+    private fun displayWeather(weather: Weather) {
+        val city = weatherBundle.city
+        with(binding) {
+            cityName.text = city.name
+            cityCoordinates.text = String.format(
+                getString(R.string.city_coordinates),
+                city.lat.toString(),
+                city.lon.toString()
+            )
+            temperatureValue.text = weather.temperature.toString()
+            feelsLikeValue.text = weather.feelsLike.toString()
+            weatherCondition.text = getCondition(weather.condition)
+
+            Picasso
+                .get()
+                .load("https://freepngimg.com/thumb/city/36275-3-city-hd.png")
+                .into(headerIcon)
+        }
+    }
+
     private fun renderData(appState: AppState) {
         when (appState) {
             is AppState.SuccessListWeather -> {
@@ -68,19 +88,6 @@ class DetailWeatherFragment : Fragment() {
             }
             else -> {}
         }
-    }
-
-    private fun displayWeather(weather: Weather) {
-        val city = weatherBundle.city
-        binding.cityName.text = city.name
-        binding.cityCoordinates.text = String.format(
-            getString(R.string.city_coordinates),
-            city.lat.toString(),
-            city.lon.toString()
-        )
-        binding.temperatureValue.text = weather.temperature.toString()
-        binding.feelsLikeValue.text = weather.feelsLike.toString()
-        binding.weatherCondition.text = getCondition(weather.condition)
     }
 
 
