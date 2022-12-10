@@ -2,8 +2,8 @@ package ru.geekbrains.myweatherapp.viewmodel
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import ru.geekbrains.myweatherapp.model.ListWeatherRepository
-import ru.geekbrains.myweatherapp.model.ListWeatherRepositoryImpl
+import ru.geekbrains.myweatherapp.repository.ListWeatherRepository
+import ru.geekbrains.myweatherapp.repository.ListWeatherRepositoryImpl
 import ru.geekbrains.myweatherapp.model.Location
 
 class WeatherListViewModel(
