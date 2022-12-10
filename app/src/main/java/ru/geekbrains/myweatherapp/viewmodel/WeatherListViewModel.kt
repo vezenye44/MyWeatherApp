@@ -5,19 +5,13 @@ import androidx.lifecycle.ViewModel
 import ru.geekbrains.myweatherapp.model.ListWeatherRepository
 import ru.geekbrains.myweatherapp.model.ListWeatherRepositoryImpl
 import ru.geekbrains.myweatherapp.model.Location
-import ru.geekbrains.myweatherapp.model.SingleWeatherRepository
-import ru.geekbrains.myweatherapp.viewmodel.AppState
 
-class WeatherListViewModel(private val liveData: MutableLiveData<AppState> = MutableLiveData<AppState>()) :
-    ViewModel() {
+class WeatherListViewModel(
+    private val liveData: MutableLiveData<AppState> = MutableLiveData<AppState>(),
     private var listWeatherRepository: ListWeatherRepository = ListWeatherRepositoryImpl()
-    private lateinit var singleWeatherRepository: SingleWeatherRepository
-    fun getLiveData() = liveData
+) : ViewModel() {
 
-    fun getWeather() {
-        liveData.value = AppState.Loading
-        liveData.value = AppState.Success(singleWeatherRepository.getWeather(0.0, 0.0))
-    }
+    fun getLiveData() = liveData
 
     fun getListWeatherForRussia() = getListWeather(Location.Russia)
     fun getListWeatherForWorld() = getListWeather(Location.World)

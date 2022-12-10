@@ -73,7 +73,9 @@ class WeatherListFragment : Fragment(){
             }
             is AppState.Error -> {
                 binding.weatherFragmentLoadingLayout.visibility = View.GONE
-                binding.root.showSnackBar("Error",Snackbar.LENGTH_INDEFINITE)
+                binding.root.showSnackBar("Ошибка загрузки", "Повторить", {
+                    if (isRussia) viewModel.getListWeatherForRussia() else viewModel.getListWeatherForWorld()
+                })
             }
             is AppState.SuccessListWeather -> {
                 val listWeather = appState.weatherList
