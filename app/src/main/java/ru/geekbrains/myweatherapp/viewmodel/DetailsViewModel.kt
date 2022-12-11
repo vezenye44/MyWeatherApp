@@ -2,7 +2,6 @@ package ru.geekbrains.myweatherapp.viewmodel
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.google.gson.Gson
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -11,7 +10,6 @@ import ru.geekbrains.myweatherapp.repository.DetailsWeatherRepository
 import ru.geekbrains.myweatherapp.repository.DetailsWeatherRepositoryImpl
 import ru.geekbrains.myweatherapp.repository.RemoteDataSource
 import ru.geekbrains.myweatherapp.util.convertDtoToModel
-import java.io.IOException
 
 private const val SERVER_ERROR = "Ошибка сервера"
 private const val REQUEST_ERROR = "Ошибка запроса на сервер"
@@ -43,16 +41,22 @@ class DetailsViewModel(
         }
 
         override fun onFailure(call: Call<WeatherDTO>, t: Throwable) {
-            liveData.postValue(AppState.Error(Throwable(t.message ?:
-            REQUEST_ERROR)))
+            liveData.postValue(
+                AppState.Error(
+                    Throwable(
+                        t.message ?: REQUEST_ERROR
+                    )
+                )
+            )
         }
 
     }
 
     private fun checkResponse(serverResponse: WeatherDTO): AppState {
         val fact = serverResponse.fact
-        return if (fact == null || fact.temp == null || fact.feels_like ==
-            null || fact.condition.isNullOrEmpty()) {
+        return if (fact?.temp == null || fact.feels_like ==
+            null || fact.condition.isNullOrEmpty()
+        ) {
             AppState.Error(Throwable(CORRUPTED_DATA))
         } else {
             AppState.SuccessListWeather(convertDtoToModel(serverResponse))

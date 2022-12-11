@@ -8,7 +8,7 @@ import android.view.ViewGroup
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import com.squareup.picasso.Picasso
+import coil.api.load
 import okhttp3.*
 import ru.geekbrains.myweatherapp.R
 import ru.geekbrains.myweatherapp.Weather
@@ -18,7 +18,6 @@ import ru.geekbrains.myweatherapp.util.showSnackBar
 import ru.geekbrains.myweatherapp.viewmodel.AppState
 import ru.geekbrains.myweatherapp.viewmodel.DetailsViewModel
 
-private const val MAIN_LINK = "https://api.weather.yandex.ru/v2/forecast?"
 
 class DetailWeatherFragment : Fragment() {
 
@@ -27,10 +26,10 @@ class DetailWeatherFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val viewModel: DetailsViewModel by lazy {
-        ViewModelProvider(this).get(DetailsViewModel::class.java)
+        ViewModelProvider(this)[DetailsViewModel::class.java]
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = DetailWeatherFragmentBinding.inflate(inflater)
         return binding.root
     }
@@ -58,10 +57,7 @@ class DetailWeatherFragment : Fragment() {
             feelsLikeValue.text = weather.feelsLike.toString()
             weatherCondition.text = getCondition(weather.condition)
 
-            Picasso
-                .get()
-                .load("https://freepngimg.com/thumb/city/36275-3-city-hd.png")
-                .into(headerIcon)
+            headerIcon.load("https://freepngimg.com/thumb/city/36275-3-city-hd.png")
         }
     }
 
