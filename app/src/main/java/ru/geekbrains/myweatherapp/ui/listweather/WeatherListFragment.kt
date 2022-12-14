@@ -1,5 +1,6 @@
 package ru.geekbrains.myweatherapp.ui.listweather
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -14,6 +15,7 @@ import ru.geekbrains.myweatherapp.util.showSnackBar
 import ru.geekbrains.myweatherapp.viewmodel.AppState
 import ru.geekbrains.myweatherapp.viewmodel.WeatherListViewModel
 
+private const val IS_RUSSIA_KEY = "LIST_OF_TOWNS_KEY"
 class WeatherListFragment : Fragment(){
 
     companion object {
@@ -44,23 +46,44 @@ class WeatherListFragment : Fragment(){
         }
 
 
-        sentList()
+        showListOfTowns()
 
         binding.weatherFragmentFAB.setOnClickListener {
             sentList()
         }
     }
+
+    private fun showListOfTowns() {
+        activity?.let {
+            if (it.getPreferences(Context.MODE_PRIVATE).getBoolean(IS_RUSSIA_KEY, true)) {
+                viewModel.getListWeatherForRussia()
+            } else {
+                sentList()
+            }
+        }
+    }
+    private fun saveListOfTowns(isRussia: Boolean) {
+        activity?.let {
+            with(it.getPreferences(Context.MODE_PRIVATE).edit()) {
+                putBoolean(IS_RUSSIA_KEY, isRussia)
+                apply()
+            }
+        }
+    }
+
     private fun sentList() { //TODO: Нормалбное название
         if (isRussia) {
-            isRussia = false
             viewModel.getListWeatherForWorld()
             binding.weatherFragmentFAB.setImageResource(R.drawable.ic_earth)
         } else {
-            isRussia = true
             viewModel.getListWeatherForRussia()
             binding.weatherFragmentFAB.setImageResource(R.drawable.ic_russia)
         }
+        isRussia = !isRussia
+
+        saveListOfTowns(isRussia)
     }
+
     private fun renderData(appState: AppState) {
         when (appState) {
             is AppState.Success -> {
