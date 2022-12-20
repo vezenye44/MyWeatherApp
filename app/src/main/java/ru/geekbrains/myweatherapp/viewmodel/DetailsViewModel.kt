@@ -6,10 +6,10 @@ import com.google.gson.Gson
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import ru.geekbrains.myweatherapp.Weather
+import ru.geekbrains.myweatherapp.app.App.Companion.getHistoryDao
 import ru.geekbrains.myweatherapp.domain.WeatherDTO
-import ru.geekbrains.myweatherapp.repository.DetailsWeatherRepository
-import ru.geekbrains.myweatherapp.repository.DetailsWeatherRepositoryImpl
-import ru.geekbrains.myweatherapp.repository.RemoteDataSource
+import ru.geekbrains.myweatherapp.repository.*
 import ru.geekbrains.myweatherapp.util.convertDtoToModel
 import java.io.IOException
 
@@ -19,7 +19,8 @@ private const val CORRUPTED_DATA = "Неполные данные"
 
 class DetailsViewModel(
     val liveData: MutableLiveData<AppState> = MutableLiveData(),
-    private val repository: DetailsWeatherRepository = DetailsWeatherRepositoryImpl(RemoteDataSource())
+    private val repository: DetailsWeatherRepository = DetailsWeatherRepositoryImpl(RemoteDataSource()),
+    private val historyRepository: LocalRepository = LocalRepositoryImpl(getHistoryDao())
 ) : ViewModel() {
 
 
@@ -28,6 +29,9 @@ class DetailsViewModel(
         repository.getWeatherDetailsFromServer(lat, lon, callBack)
     }
 
+    fun saveCityToDB(weather: Weather) {
+        historyRepository.saveEntity(weather)
+    }
 
     private val callBack = object : Callback<WeatherDTO> {
         override fun onResponse(call: Call<WeatherDTO>, response: Response<WeatherDTO>) {
