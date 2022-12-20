@@ -8,8 +8,10 @@ import android.view.ViewGroup
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.liveData
 import com.squareup.picasso.Picasso
 import okhttp3.*
+import ru.geekbrains.myweatherapp.City
 import ru.geekbrains.myweatherapp.R
 import ru.geekbrains.myweatherapp.Weather
 import ru.geekbrains.myweatherapp.databinding.DetailWeatherFragmentBinding
@@ -47,6 +49,7 @@ class DetailWeatherFragment : Fragment() {
 
     private fun displayWeather(weather: Weather) {
         val city = weatherBundle.city
+        saveCity(city, weather)
         with(binding) {
             cityName.text = city.name
             cityCoordinates.text = String.format(
@@ -63,6 +66,20 @@ class DetailWeatherFragment : Fragment() {
                 .load("https://freepngimg.com/thumb/city/36275-3-city-hd.png")
                 .into(headerIcon)
         }
+    }
+
+    private fun saveCity(
+        city: City,
+        weather: Weather
+    ) {
+        viewModel.saveCityToDB(
+            Weather(
+                city,
+                weather.temperature,
+                weather.feelsLike,
+                weather.condition
+            )
+        )
     }
 
     private fun renderData(appState: AppState) {
