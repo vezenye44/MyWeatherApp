@@ -2,6 +2,7 @@ plugins {
     id 'com.android.application'
     id 'kotlin-android'
     id 'kotlin-android-extensions'
+    id 'kotlin-kapt'
 }
 
 android {
@@ -45,6 +46,10 @@ android {
 
 dependencies {
 
+    //Room
+    implementation 'androidx.room:room-runtime:2.2.5'
+    kapt 'androidx.room:room-compiler:2.2.5'
+
     //Picasso
     implementation 'com.squareup.picasso:picasso:2.71828'
 
@@ -54,6 +59,7 @@ dependencies {
 
     //OkHttp
     implementation 'com.squareup.okhttp3:okhttp:3.14.9'
+    implementation 'com.squareup.okhttp3:logging-interceptor:3.12.2'
 
     // GSON
     implementation 'com.google.code.gson:gson:2.8.5'
