@@ -30,6 +30,12 @@ android {
     }
 
     buildTypes {
+        beta {
+            versionNameSuffix '-beta'
+        }
+        alfa {
+            versionNameSuffix '-alfa'
+        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
@@ -42,9 +48,25 @@ android {
     kotlinOptions {
         jvmTarget = '1.8'
     }
+    flavorDimensions 'versions'
+    productFlavors {
+        free {
+            dimension 'versions'
+            versionNameSuffix '.free'
+        }
+        pro {
+            dimension 'versions'
+            versionNameSuffix '.pro'
+        }
+    }
 }
 
 dependencies {
+
+    //Firebase
+    implementation platform('com.google.firebase:firebase-bom:31.1.1')
+    // Необязательно ...
+    implementation 'com.google.firebase:firebase-messaging:23.1.1'
 
     //Room
     implementation 'androidx.room:room-runtime:2.2.5'
@@ -82,3 +104,5 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
 }
+
+apply plugin :'com.google.gms.google-services'
