@@ -30,6 +30,12 @@ android {
     }
 
     buildTypes {
+        beta {
+            versionNameSuffix '-beta'
+        }
+        alfa {
+            versionNameSuffix '-alfa'
+        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
@@ -41,6 +47,17 @@ android {
     }
     kotlinOptions {
         jvmTarget = '1.8'
+    }
+    flavorDimensions 'versions'
+    productFlavors {
+        free {
+            dimension 'versions'
+            versionNameSuffix '.free'
+        }
+        pro {
+            dimension 'versions'
+            versionNameSuffix '.pro'
+        }
     }
 }
 
